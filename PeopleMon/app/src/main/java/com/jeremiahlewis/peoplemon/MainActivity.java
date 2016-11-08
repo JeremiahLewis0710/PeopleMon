@@ -18,6 +18,8 @@ public class MainActivity extends AppCompatActivity {
     private Flow flow;
     private ScreenplayDispatcher dispatcher;
     private String TAG = "Main Acitivity";
+    public Bundle savedInstanceState;
+
 
     @Bind(R.id.container)
     RelativeLayout container;
