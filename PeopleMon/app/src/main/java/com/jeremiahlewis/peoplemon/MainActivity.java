@@ -1,6 +1,11 @@
 package com.jeremiahlewis.peoplemon;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.RelativeLayout;
 
@@ -42,7 +47,17 @@ public class MainActivity extends AppCompatActivity {
             History newHistory = History.single(new LoginStage());
             flow.setHistory(newHistory, Flow.Direction.REPLACE);
         }
+
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (!(ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION) ==//will need to replace read external storage to access location
+                    PackageManager.PERMISSION_GRANTED)) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            }
+        }
     }
+
 
     @Override
     public void onBackPressed() {
