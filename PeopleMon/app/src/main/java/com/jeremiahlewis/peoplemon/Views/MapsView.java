@@ -9,6 +9,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -19,11 +20,13 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.jeremiahlewis.peoplemon.MainActivity;
 import com.jeremiahlewis.peoplemon.Models.Account;
+import com.jeremiahlewis.peoplemon.Models.User;
 import com.jeremiahlewis.peoplemon.Network.RestClient;
 import com.jeremiahlewis.peoplemon.PeopleMonApplication;
 import com.jeremiahlewis.peoplemon.R;
@@ -192,6 +195,7 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16.0f));
 
             mMap.clear();
+            checkNearby();
         }
     };
 
@@ -221,6 +225,36 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
         });
 
     }
+
+    public void checkNearby(){
+        RestClient restClient = new RestClient();
+        restClient.getApiService().findUsersNearby(500).enqueue(new Callback<User[]>() {
+            @Override
+            public void onResponse(Call<User[]> call, Response<User[]> response) {
+                if (response.isSuccessful()){
+                    for(User user : response.body()){
+                        lastLat = user.getLatitude();
+                        lastLong = user.getLongitude();
+                        LatLng userpos = new LatLng(lastLat, lastLong);
+                        mMap.addMarker(new MarkerOptions().title(user.getUserName())
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.cast_mini_controller_img_placeholder))
+                                .snippet("other person")
+                                .position(userpos));
+                    }
+                } else{
+                    Toast.makeText(context, "you messesd up", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User[]> call, Throwable t) {
+                Toast.makeText(context, "you messesd up", Toast.LENGTH_LONG).show();
+
+
+            }
+        });
+    }
+
 
 
 }

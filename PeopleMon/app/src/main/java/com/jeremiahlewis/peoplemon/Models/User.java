@@ -26,12 +26,19 @@ public class User {
     @SerializedName("Created")
     private String Created;
 
+    public User(){}
+
     public User(String userId, String userName, String avatarBase64, double longitude, double latitude) {
         UserId = userId;
         UserName = userName;
         AvatarBase64 = avatarBase64;
         Longitude = longitude;
         Latitude = latitude;
+    }
+
+    public User(double Latitude, double Longitude){
+        this.Latitude = Latitude;
+        this.Longitude = Longitude;
     }
 
     public String getUserId() {

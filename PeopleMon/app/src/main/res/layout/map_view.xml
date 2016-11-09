@@ -33,5 +33,7 @@
             android:layout_margin="10dp"
             android:src="@drawable/common_ic_googleplayservices"/>
 
+
+
     </android.support.design.widget.CoordinatorLayout>
 </com.jeremiahlewis.peoplemon.Views.MapsView>
