@@ -15,4 +15,5 @@
     <string name="must_provide_password">Must provide username and password</string>
     <string name="login_failed">Login Failed</string>
     <string name="google_android_map_api_key">AIzaSyDFnw0l7xG-e9UbdGsd_uLIG9taLoENiSQ</string>
+    <string name="logout">Logout</string>
 </resources>

@@ -1,6 +1,7 @@
 package com.jeremiahlewis.peoplemon.Network;
 
 import com.jeremiahlewis.peoplemon.Models.Account;
+import com.jeremiahlewis.peoplemon.Models.User;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -21,6 +22,9 @@ public interface ApiService {
     Call<Account> login(@Field(value = "grant_type", encoded = true) String grantType,
                @Field(value = "username", encoded = true) String username,
                @Field(value = "password", encoded = true ) String password);
+
+    @POST("v1/User/CheckIn")
+    Call<Void> checkin(@Body User user);
 
 
 

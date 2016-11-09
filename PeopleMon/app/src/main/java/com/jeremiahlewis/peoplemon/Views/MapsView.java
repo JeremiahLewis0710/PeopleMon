@@ -5,6 +5,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.RelativeLayout;
@@ -14,7 +15,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.Place;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -27,8 +28,6 @@ import com.jeremiahlewis.peoplemon.R;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-import static com.google.android.gms.maps.CameraUpdateFactory.newLatLngZoom;
-
 
 /**
  * Created by jeremiahlewis on 11/8/16.
@@ -36,7 +35,7 @@ import static com.google.android.gms.maps.CameraUpdateFactory.newLatLngZoom;
 
 public class MapsView extends RelativeLayout implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-        GoogleMap.OnMarkerClickListener, LocationListener {
+        GoogleMap.OnMarkerClickListener {
     private GoogleApiClient mGoogleApiClient;
 
     public static final String TAG = MapsView.class.getSimpleName();
@@ -48,6 +47,8 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
     private LocationListener locationListener;
     private double lastLat;
     private double lastLong;
+    private GoogleMap mMap;
+    private Marker mMarker;
 
     private Context context;
 
@@ -57,6 +58,9 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
 
     @Bind(R.id.map)
      MapView mapsView;
+
+    @Bind(R.id.view_caught_button)
+    FloatingActionButton viewCaught;
 
     @Override
     protected void onFinishInflate() {
@@ -79,23 +83,40 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
                 .setInterval(10 * 1000)
                 .setFastestInterval(1*1000);
 
+//        ((MainActivity)context).showMenuItem(true);
+
 
     }
 
     public void onMapReady(GoogleMap googleMap) {
-        int STREET_LEVEL = 15;
-        int BUILDING_LEVEL = 20;
-        LatLng ELEVEN_FIFTY = new LatLng(38.0405837, -84.5037164);
-        Place currentPlace = null;
-        googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        googleMap.moveCamera(newLatLngZoom(ELEVEN_FIFTY, BUILDING_LEVEL));
-        googleMap.addMarker(new MarkerOptions().anchor(0.0f, 1.0f).position(ELEVEN_FIFTY));
+//        int STREET_LEVEL = 15;
+//        int BUILDING_LEVEL = 20;
+//        LatLng currentLocation = new LatLng(38.0405837, -84.5037164);
+//        Place currentPlace = null;
+//        googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+//        googleMap.moveCamera(newLatLngZoom(currentLocation, BUILDING_LEVEL));
+//        googleMap.addMarker(new MarkerOptions().anchor(0.0f, 1.0f).position(currentLocation));
+        mMap = googleMap;
+        mMap.getUiSettings().isMyLocationButtonEnabled();
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+        mMap.setOnMyLocationChangeListener(myLocationChangeListener);
+
+        try {
+            mMap.setMyLocationEnabled(true);
+        } catch (SecurityException e){
+
+        }
+        mMap.clear();
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
 
 
 
     }
 
-    @Override
+
+
+        @Override
     public void onConnected(@Nullable  Bundle bundle) {
         Log.i(TAG, "Location services connected.");//This gives permission to access the location data.
 
@@ -118,6 +139,8 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
                 handleNewLocation(lastLocation);
             }
             Log.d(">>>>>>>>>>>>>>>>>>>>", "CONNECTED");
+
+
         }
 
     @Override
@@ -140,11 +163,20 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
 
     private void handleNewLocation(Location location){
         Log.d(TAG, location.toString());
+
+//
     }
 
 
-    @Override
-    public void onLocationChanged(Location location) {
-        handleNewLocation(lastLocation);
-    }
+    private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
+        @Override
+        public void onMyLocationChange(Location location) {
+            LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(loc));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16.0f));
+
+            mMap.clear();
+            }
+    };
+
 }

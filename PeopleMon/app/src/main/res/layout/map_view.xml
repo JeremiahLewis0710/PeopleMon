@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.jeremiahlewis.peoplemon.Views.MapsView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/container_wrapper">
 <com.google.android.gms.maps.MapView
@@ -8,4 +10,29 @@
     android:layout_height="match_parent"
     android:id="@+id/map">
 </com.google.android.gms.maps.MapView>
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true">
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_dialog_map"
+            app:fabSize="normal"
+            android:id="@+id/move_to_location_button"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="10dp"
+            />
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/btn_dropdown"
+            app:fabSize="normal"
+            android:id="@+id/view_caught_button"
+            android:layout_gravity="bottom|start"
+            android:layout_margin="10dp"/>
+
+    </android.support.design.widget.CoordinatorLayout>
 </com.jeremiahlewis.peoplemon.Views.MapsView>

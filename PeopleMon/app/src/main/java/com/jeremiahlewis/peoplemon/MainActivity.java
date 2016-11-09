@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
 import android.widget.RelativeLayout;
 
 import com.davidstemmer.flow.plugin.screenplay.ScreenplayDispatcher;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private ScreenplayDispatcher dispatcher;
     private String TAG = "Main Acitivity";
     public Bundle savedInstanceState;
+    private Menu menu;
 
 
     @Bind(R.id.container)
@@ -39,8 +41,6 @@ public class MainActivity extends AppCompatActivity {
         flow = PeopleMonApplication.getMainFlow();
         dispatcher = new ScreenplayDispatcher(this, container);
         dispatcher.setUp(flow);
-
-//        testCalls();
 
         if (UserStore.getInstance().getToken() == null ||
                 UserStore.getInstance().getTokenExpiration() == null){
@@ -68,21 +68,40 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-//        private void testCalls(){
-//        RestClient restClient = new RestClient();
-//        restClient.getApiService().getPost(1).enqueue(new Callback<TestPost>() {
-//            @Override
-//            public void onResponse(Call<TestPost> call, Response<TestPost> response) {
-//                Log.d(TAG, "GetPost - Title: " + response.body().getTitle()
-//                        + "/nBody: " + response.body().getBody());
-//            }
-//            @Override
-//            public void onFailure(Call<TestPost> call, Throwable t) {
-//                Log.d(TAG, "GetPost failed");
-//            }
-//        });
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu){
+//        getMenuInflater().inflate(R.menu.activity_menu, menu);
+//        this.menu = menu;
+//        return true;
+//    }
+//
+//    @Override//when a user taps the calendar icon it will bring the user to the calendar list view
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId()) {
+//            case R.id.logout_option:
+//                Flow flow = PeopleMonApplication.getMainFlow();
+//                History newHistory = flow.getHistory().buildUpon()
+//                        .push(new LoginStage())
+//                        .build();
+//                flow.setHistory(newHistory, Flow.Direction.REPLACE);
+//                return true;
+//            default:
+//                return super.onOptionsItemSelected(item);
+//        }
+//
+//    }
+//
+//    public void showMenuItem(boolean show){
+//        if (menu != null){
+//            menu.findItem(R.id.logout_option).setVisible(show);
+//
+//        }
+//
+//    }
 
 
 
-    }
+
+
+}
 

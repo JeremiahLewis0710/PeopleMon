@@ -56,6 +56,8 @@ public class LoginView extends LinearLayout {
     protected void onFinishInflate() {
         super.onFinishInflate();
         ButterKnife.bind(this);
+
+//        ((MainActivity)context).showMenuItem(false);
     }
 
 
