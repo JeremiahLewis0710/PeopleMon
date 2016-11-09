@@ -39,10 +39,11 @@ public class Account {
     @SerializedName("Grant_Type")
     private String grant_type;
 
+    @SerializedName("Latitude")
+    private double Latitude;
 
-
-
-
+    @SerializedName("Longitude")
+    private double Longitude;
 
     public Account(){}
 
@@ -59,6 +60,16 @@ public class Account {
         this.FullName = FullName;
         this.password = password;
         this.grant_type = grant_type;
+    }
+
+    public Account(double Longitude, double Latitude){
+        this.Longitude = Longitude;
+        this.Latitude = Latitude;
+    }
+
+    public Account(String AvatarBase64, String FullName){
+        this.AvatarBase64 = AvatarBase64;
+        this.FullName = FullName;
     }
 
     public String getId() {
@@ -107,5 +118,21 @@ public class Account {
 
     public void setExpiration(Date expiration) {
         this.expiration = expiration;
+    }
+
+    public double getLatitude() {
+        return Latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        Latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return Longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        Longitude = longitude;
     }
 }

@@ -23,6 +23,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.jeremiahlewis.peoplemon.MainActivity;
+import com.jeremiahlewis.peoplemon.Models.Account;
+import com.jeremiahlewis.peoplemon.Network.RestClient;
 import com.jeremiahlewis.peoplemon.PeopleMonApplication;
 import com.jeremiahlewis.peoplemon.R;
 import com.jeremiahlewis.peoplemon.Stages.ListCaughtStage;
@@ -32,6 +34,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import flow.Flow;
 import flow.History;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 /**
@@ -53,8 +58,11 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
     private double lastLat;
     private double lastLong;
     private GoogleMap mMap;
+    private double latitude;
+    private double longitude;
 
     private Context context;
+
 
     public MapsView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -91,6 +99,8 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
                 .setFastestInterval(1 * 1000);
 
 //        ((MainActivity)context).showMenuItem(true);
+
+        //Check In
 
 
     }
@@ -192,6 +202,24 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
                 .push(new ListCaughtStage())
                 .build();
         flow.setHistory(newHistory, Flow.Direction.FORWARD);
+    }
+
+    @OnClick(R.id.checkIn_Button)
+    public void checkIn(){
+        Account account = new Account(lastLong, lastLat);
+        RestClient restClient = new RestClient();
+        restClient.getApiService().checkin(account).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+
+            }
+        });
+
     }
 
 

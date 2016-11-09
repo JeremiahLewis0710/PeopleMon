@@ -16,4 +16,6 @@
     <string name="login_failed">Login Failed</string>
     <string name="google_android_map_api_key">AIzaSyDFnw0l7xG-e9UbdGsd_uLIG9taLoENiSQ</string>
     <string name="logout">Logout</string>
+    <string name="check_in_successful">Check In Successful</string>
+    <string name="check_in_failed">Check In Failed</string>
 </resources>
