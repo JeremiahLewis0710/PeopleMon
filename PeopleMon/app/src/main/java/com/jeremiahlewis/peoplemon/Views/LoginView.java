@@ -87,8 +87,8 @@ public class LoginView extends LinearLayout {
             Toast.makeText(context, R.string.must_provide_password,
                     Toast.LENGTH_LONG).show();
         } else {
-            loginButton.setEnabled(true);
-            registerButton.setEnabled(true);
+            loginButton.setEnabled(false);
+            registerButton.setEnabled(false);
 
            // Account account = new Account(grantType,usernameField, passwordField);
             RestClient restClient = new RestClient();

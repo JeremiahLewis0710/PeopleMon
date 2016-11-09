@@ -23,10 +23,15 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.jeremiahlewis.peoplemon.MainActivity;
+import com.jeremiahlewis.peoplemon.PeopleMonApplication;
 import com.jeremiahlewis.peoplemon.R;
+import com.jeremiahlewis.peoplemon.Stages.ListCaughtStage;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import flow.Flow;
+import flow.History;
 
 
 /**
@@ -48,7 +53,6 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
     private double lastLat;
     private double lastLong;
     private GoogleMap mMap;
-    private Marker mMarker;
 
     private Context context;
 
@@ -57,16 +61,19 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
     }
 
     @Bind(R.id.map)
-     MapView mapsView;
+    MapView mapsView;
 
     @Bind(R.id.view_caught_button)
     FloatingActionButton viewCaught;
+
+    @Bind(R.id.checkIn_Button)
+    FloatingActionButton checkIn;
 
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
         ButterKnife.bind(this);
-        mapsView.onCreate(((MainActivity)getContext()).savedInstanceState);
+        mapsView.onCreate(((MainActivity) getContext()).savedInstanceState);
         mapsView.onResume();
         mapsView.getMapAsync(this);
 
@@ -81,7 +88,7 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(10 * 1000)
-                .setFastestInterval(1*1000);
+                .setFastestInterval(1 * 1000);
 
 //        ((MainActivity)context).showMenuItem(true);
 
@@ -103,45 +110,44 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
 
         try {
             mMap.setMyLocationEnabled(true);
-        } catch (SecurityException e){
+        } catch (SecurityException e) {
 
         }
         mMap.clear();
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
 
-
-
     }
 
 
-
-        @Override
-    public void onConnected(@Nullable  Bundle bundle) {
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
         Log.i(TAG, "Location services connected.");//This gives permission to access the location data.
 
+        try {
+            lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
+        if (lastLocation != null) {
+            lastLat = lastLocation.getLatitude();
+            lastLong = lastLocation.getLongitude();
+            Log.d("------------------>", lastLat + "  " + lastLong);
+        } else if (lastLocation == null) {
             try {
-                lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            } catch (SecurityException e){
+                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, locationListener);
+            } catch (SecurityException e) {
                 e.printStackTrace();
             }
-            if(lastLocation != null){
-                lastLat = lastLocation.getLatitude();
-                lastLong = lastLocation.getLongitude();
-                Log.d("------------------>", lastLat + "  " + lastLong);
-            } else if (lastLocation == null){
-                try {
-                    LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, locationListener);
-                } catch (SecurityException e){
-                    e.printStackTrace();
-                }
-            } else {
-                handleNewLocation(lastLocation);
-            }
-            Log.d(">>>>>>>>>>>>>>>>>>>>", "CONNECTED");
-
-
+        } else {
+            handleNewLocation(lastLocation);
         }
+        Log.d(">>>>>>>>>>>>>>>>>>>>", "CONNECTED");
+
+
+
+
+    }
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -161,7 +167,7 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
         return false;
     }
 
-    private void handleNewLocation(Location location){
+    private void handleNewLocation(Location location) {
         Log.d(TAG, location.toString());
 
 //
@@ -176,7 +182,17 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16.0f));
 
             mMap.clear();
-            }
+        }
     };
+
+    @OnClick(R.id.view_caught_button)
+    public void viewCaught() {
+        Flow flow = PeopleMonApplication.getMainFlow();
+        History newHistory = flow.getHistory().buildUpon()
+                .push(new ListCaughtStage())
+                .build();
+        flow.setHistory(newHistory, Flow.Direction.FORWARD);
+    }
+
 
 }
