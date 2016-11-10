@@ -26,7 +26,7 @@ public interface ApiService {
                @Field(value = "password", encoded = true ) String password);
 
     @POST("v1/User/CheckIn")
-    Call<Void> checkin(@Body Account account);
+    Call<Void>checkin(@Body Account account);
 
     @GET("v1/User/Nearby")
     Call<User[]>findUsersNearby(@Query("radiusInMeters")Integer radiusInMeters);
@@ -37,6 +37,15 @@ public interface ApiService {
 
     @POST("/api/Account/UserInfo")
     Call<Void>postUserInfo(@Body Account account);
+
+    @FormUrlEncoded
+    @POST("/v1/User/Catch")
+    Call<Void>catchThem(@Field ("CaughtUserId") String UserId,
+                        @Field ("RadiusInMeters") Integer RadiusInMeters);
+
+    //View Caught Users
+    @GET("v1/User/Caught")
+    Call<User[]>viewCaught();
 
 
 

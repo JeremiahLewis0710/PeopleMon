@@ -23,7 +23,7 @@ public class ListCaughtStage extends IndexedStage {
 
     @Override
     public int getLayoutId() {
-        return R.layout.list_caught_view;
+        return R.layout.caught_people_listview;
     }
 
     @Override

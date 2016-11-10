@@ -41,6 +41,17 @@ public class User {
         this.Longitude = Longitude;
     }
 
+    public User(String UserId, String UserName, String Created, String AvatarBase64){
+        this.UserId = UserId;
+        this.UserName = UserName;
+        this.Created = Created;
+        this.AvatarBase64 = AvatarBase64;
+    }
+
+    public User(String UserId){
+        this.UserId = UserId;
+    }
+
     public String getUserId() {
         return UserId;
     }
