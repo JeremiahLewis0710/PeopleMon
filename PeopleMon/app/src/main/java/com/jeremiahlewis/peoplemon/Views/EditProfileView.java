@@ -76,6 +76,7 @@ public class EditProfileView extends RelativeLayout {
     @OnClick(R.id.upload_avatar)
     public void uploadAvatar(){
         ((MainActivity)context).getImage();
+
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

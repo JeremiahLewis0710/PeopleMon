@@ -1,6 +1,9 @@
 package com.jeremiahlewis.peoplemon.Views;
 
+import android.animation.IntEvaluator;
+import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -22,6 +26,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.GroundOverlay;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -72,8 +80,9 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
     private String UserName;
     private String Created;
     private String AvatarBase64;
+    private LatLng Home = new LatLng(latitude, longitude);
 
-private Context context;
+    private Context context;
 
     public MapsView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -111,9 +120,7 @@ private Context context;
                 .setFastestInterval(1 * 1000);
 
 
-
 //        ((MainActivity)context).showMenuItem(true);
-
 
 
     }
@@ -136,7 +143,7 @@ private Context context;
             return;//delete this if problems happen
 
         }
-                checkNear = new Handler();
+        checkNear = new Handler();
         final Runnable r = new Runnable() {
             public void run() {
                 checkNearby();
@@ -158,6 +165,30 @@ private Context context;
         mMap.clear();
         mMap.setOnMyLocationChangeListener(myLocationChangeListener);
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+        GroundOverlayOptions radar = new GroundOverlayOptions()
+                .image(BitmapDescriptorFactory.fromResource(R.mipmap.radar))
+                .position(Home, 200f, 200f);
+        GroundOverlay imageOverlay = mMap.addGroundOverlay(radar);
+
+        final Circle circle = mMap.addCircle(new CircleOptions().center(Home)
+                .strokeColor(Color.BLUE).radius(80));
+        ValueAnimator vAnimator = new ValueAnimator();
+        vAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        vAnimator.setRepeatMode(ValueAnimator.RESTART);  /* PULSE */
+        vAnimator.setIntValues(80, 0);
+        vAnimator.setDuration(2500);
+        vAnimator.setEvaluator(new IntEvaluator());
+        vAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+        vAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                float animatedFraction = valueAnimator.getAnimatedFraction();
+                // Log.e("", "" + animatedFraction);
+                circle.setRadius(animatedFraction * 80);
+            }
+        });
+        vAnimator.start();
 
 
     }
@@ -188,12 +219,6 @@ private Context context;
         Log.d(">>>>>>>>>>>>>>>>>>>>", "CONNECTED");
 
 
-
-
-
-
-
-
     }
 
     @Override
@@ -209,10 +234,10 @@ private Context context;
     }
 
     @Override
-    public boolean onMarkerClick (Marker marker){
+    public boolean onMarkerClick(Marker marker) {
         return false;
 
-        }
+    }
 
 
     private void handleNewLocation(Location location) {
@@ -230,6 +255,30 @@ private Context context;
             mMap.addMarker(new MarkerOptions().position(loc));
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16.0f));
 
+            GroundOverlayOptions radar = new GroundOverlayOptions()
+                    .image(BitmapDescriptorFactory.fromResource(R.mipmap.radar))
+                    .position(loc, 200f, 200f);
+            GroundOverlay imageOverlay = mMap.addGroundOverlay(radar);
+
+            final Circle circle = mMap.addCircle(new CircleOptions().center(loc)
+                    .strokeColor(Color.BLUE).radius(80));
+            ValueAnimator vAnimator = new ValueAnimator();
+            vAnimator.setRepeatCount(ValueAnimator.INFINITE);
+            vAnimator.setRepeatMode(ValueAnimator.RESTART);  /* PULSE */
+            vAnimator.setIntValues(80, 0);
+            vAnimator.setDuration(2500);
+            vAnimator.setEvaluator(new IntEvaluator());
+            vAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+            vAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    float animatedFraction = valueAnimator.getAnimatedFraction();
+                    // Log.e("", "" + animatedFraction);
+                    circle.setRadius(animatedFraction * 80);
+                }
+            });
+            vAnimator.start();
+
             mMap.clear();
 
         }
@@ -245,13 +294,13 @@ private Context context;
         flow.setHistory(newHistory, Flow.Direction.FORWARD);
     }
 
-    public void checkIn(){
+    public void checkIn() {
         Account account = new Account(lastLong, lastLat);
         RestClient restClient = new RestClient();
         restClient.getApiService().checkin(account).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     Log.d(TAG, "onResponse: I AM CHECKING IN ");
                 }
 
@@ -266,14 +315,14 @@ private Context context;
 
     }
 
-    public void checkNearby(){
+    public void checkNearby() {
         RestClient restClient = new RestClient();
         restClient.getApiService().findUsersNearby(500).enqueue(new Callback<User[]>() {
             @Override
             public void onResponse(Call<User[]> call, Response<User[]> response) {
-                if (response.isSuccessful()){
+                if (response.isSuccessful()) {
                     Toast.makeText(context, "TOAST SUCCESSFUL", Toast.LENGTH_SHORT).show();
-                    for(User user : response.body()){
+                    for (User user : response.body()) {
                         lastLat = user.getLatitude();
                         lastLong = user.getLongitude();
                         LatLng userpos = new LatLng(lastLat, lastLong);
@@ -282,7 +331,7 @@ private Context context;
                                 .snippet(user.getUserId())
                                 .position(userpos));
                     }
-                } else{
+                } else {
                     Toast.makeText(context, "you messesd up", Toast.LENGTH_LONG).show();
                 }
             }
@@ -306,7 +355,7 @@ private Context context;
         });
     }
 
-    public void catchThem(){
+    public void catchThem() {
         RestClient restClient = new RestClient();
         restClient.getApiService().catchThem(UserId, 100).enqueue(new Callback<Void>() {
             @Override
@@ -321,7 +370,6 @@ private Context context;
         });
 
     }
-
 
 
 }

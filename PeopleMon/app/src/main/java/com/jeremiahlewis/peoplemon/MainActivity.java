@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         ButterKnife.bind(this);
 
         flow = PeopleMonApplication.getMainFlow();
@@ -69,17 +70,32 @@ public class MainActivity extends AppCompatActivity {
         dispatcher.setUp(flow);
 
         if (UserStore.getInstance().getToken() == null ||
-                UserStore.getInstance().getTokenExpiration() == null){
+                UserStore.getInstance().getTokenExpiration() == null) {
             History newHistory = History.single(new LoginStage());
             flow.setHistory(newHistory, Flow.Direction.REPLACE);
         }
 
         if (Build.VERSION.SDK_INT >= 23) {
             if (!(ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION) ==//will need to replace read external storage to access location
-                    PackageManager.PERMISSION_GRANTED)) {
+                    Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            }
+        }
+
+        if (!(ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+                PackageManager.PERMISSION_GRANTED)) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        }
+
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (!(ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE) ==
+                    PackageManager.PERMISSION_GRANTED)) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
             }
         }
     }
@@ -151,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("***BASE64****", encodedImage);
                 makeApiCallForProfile(encodedImage);
 
+
                 //Make API Call to Send Base64 to Server
 
 
@@ -180,13 +197,11 @@ public class MainActivity extends AppCompatActivity {
 
 
                 }else{
-                    Toast.makeText(context,"Get User Info Failed" + ": " + response.code(), Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                Toast.makeText(context,"Get User Info Failed", Toast.LENGTH_LONG).show();
             }
         });
     }
