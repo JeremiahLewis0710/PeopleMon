@@ -43,6 +43,7 @@ import com.jeremiahlewis.peoplemon.Network.RestClient;
 import com.jeremiahlewis.peoplemon.PeopleMonApplication;
 import com.jeremiahlewis.peoplemon.R;
 import com.jeremiahlewis.peoplemon.Stages.ListCaughtStage;
+import com.jeremiahlewis.peoplemon.Stages.ViewNearbyStage;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -240,7 +241,7 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
 
 //
     }
-    
+
 
 
     private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
@@ -282,6 +283,15 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
         Flow flow = PeopleMonApplication.getMainFlow();
         History newHistory = flow.getHistory().buildUpon()
                 .push(new ListCaughtStage())
+                .build();
+        flow.setHistory(newHistory, Flow.Direction.FORWARD);
+    }
+
+    @OnClick(R.id.checkIn_Button)
+    public void viewNearby(){
+        Flow flow = PeopleMonApplication.getMainFlow();
+        History newHistory = flow.getHistory().buildUpon()
+                .push(new ViewNearbyStage())
                 .build();
         flow.setHistory(newHistory, Flow.Direction.FORWARD);
     }
