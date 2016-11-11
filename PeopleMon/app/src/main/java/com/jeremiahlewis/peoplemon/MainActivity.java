@@ -45,7 +45,7 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
     private Flow flow;
     private ScreenplayDispatcher dispatcher;
-    private String TAG = "Main Acitivity";
+    private String TAG = "Main Activity";
     public Bundle savedInstanceState;
     private Menu menu;
     private static int RESULT_LOAD_IMAGE = 1;

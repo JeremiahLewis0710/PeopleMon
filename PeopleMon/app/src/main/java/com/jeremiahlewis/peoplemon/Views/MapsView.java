@@ -3,6 +3,8 @@ package com.jeremiahlewis.peoplemon.Views;
 import android.animation.IntEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
@@ -11,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.util.AttributeSet;
+import android.util.Base64;
 import android.util.Log;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.RelativeLayout;
@@ -80,7 +83,10 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
     private String UserName;
     private String Created;
     private String AvatarBase64;
-    private LatLng Home = new LatLng(latitude, longitude);
+
+
+
+     LatLng Home = new LatLng(latitude, longitude);
 
     private Context context;
 
@@ -136,31 +142,31 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
         mMap = googleMap;
         mMap.getUiSettings().isMyLocationButtonEnabled();
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
+        mMap.clear();
 
         try {
             mMap.setMyLocationEnabled(true);
         } catch (SecurityException e) {
-            return;//delete this if problems happen
 
         }
         checkNear = new Handler();
         final Runnable r = new Runnable() {
             public void run() {
                 checkNearby();
-                checkNear.postDelayed(this, 2000);
+                checkNear.postDelayed(this, 5000);
             }
         };
-        checkNear.postDelayed(r, 2000);
+        checkNear.postDelayed(r, 5000);
 
         checkingIn = new Handler();
         final Runnable ci = new Runnable() {
             public void run() {
                 checkIn();
-                checkingIn.postDelayed(this, 2000);
+                checkingIn.postDelayed(this, 5000);
 
             }
         };
-        checkingIn.postDelayed(ci, 2000);
+        checkingIn.postDelayed(ci, 5000);
 
         mMap.clear();
         mMap.setOnMyLocationChangeListener(myLocationChangeListener);
@@ -252,7 +258,7 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
         @Override
         public void onMyLocationChange(Location location) {
             LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(loc));
+//            mMap.addMarker(new MarkerOptions().position(loc));
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16.0f));
 
             GroundOverlayOptions radar = new GroundOverlayOptions()
@@ -273,13 +279,10 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
                 @Override
                 public void onAnimationUpdate(ValueAnimator valueAnimator) {
                     float animatedFraction = valueAnimator.getAnimatedFraction();
-                    // Log.e("", "" + animatedFraction);
                     circle.setRadius(animatedFraction * 80);
                 }
             });
             vAnimator.start();
-
-            mMap.clear();
 
         }
     };
@@ -309,6 +312,7 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 Log.d(TAG, "onFailure: **********MESSED UP*******");
+                Toast.makeText(context, "Check In Failed", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -317,19 +321,39 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
 
     public void checkNearby() {
         RestClient restClient = new RestClient();
-        restClient.getApiService().findUsersNearby(500).enqueue(new Callback<User[]>() {
+        restClient.getApiService().findUsersNearby(100).enqueue(new Callback<User[]>() {
             @Override
             public void onResponse(Call<User[]> call, Response<User[]> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(context, "TOAST SUCCESSFUL", Toast.LENGTH_SHORT).show();
                     for (User user : response.body()) {
-                        lastLat = user.getLatitude();
-                        lastLong = user.getLongitude();
-                        LatLng userpos = new LatLng(lastLat, lastLong);
-                        mMap.addMarker(new MarkerOptions().title(user.getUserName())
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.user))
-                                .snippet(user.getUserId())
-                                .position(userpos));
+
+                        if(user.getAvatarBase64() == null || user.getAvatarBase64().length()<=100) {
+                            lastLat = user.getLatitude();
+                            lastLong = user.getLongitude();
+                            LatLng userpos = new LatLng(lastLat, lastLong);
+                            mMap.addMarker(new MarkerOptions().title(user.getUserName())
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.user))
+                                    .snippet(user.getUserId())
+                                    .position(userpos));
+                        } else{
+                            String encodedImage = user.getAvatarBase64();
+                            byte[] decodedString = Base64.decode(encodedImage, Base64.DEFAULT);
+                            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                            try {
+                                decodedByte = Bitmap.createScaledBitmap(decodedByte, 120, 120, false);
+
+                                lastLat = user.getLatitude();
+                                lastLong = user.getLongitude();
+                                LatLng userpos = new LatLng(lastLat, lastLong);
+                                mMap.addMarker(new MarkerOptions().title(user.getUserName())
+                                        .icon(BitmapDescriptorFactory.fromBitmap(decodedByte))
+                                        .snippet(user.getUserId())
+                                        .position(userpos));
+                            }catch(Exception e){
+                                Log.e(MapsView.class.getSimpleName(),e.toString());
+                            }
+                        }
+
                     }
                 } else {
                     Toast.makeText(context, "you messesd up", Toast.LENGTH_LONG).show();
@@ -342,6 +366,7 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
 
 
             }
+
         });
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -357,7 +382,7 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
 
     public void catchThem() {
         RestClient restClient = new RestClient();
-        restClient.getApiService().catchThem(UserId, 100).enqueue(new Callback<Void>() {
+        restClient.getApiService().catchThem(UserId, 500).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
 
