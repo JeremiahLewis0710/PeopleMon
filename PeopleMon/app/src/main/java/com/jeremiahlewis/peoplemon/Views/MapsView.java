@@ -124,21 +124,10 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(10 * 1000)
                 .setFastestInterval(1 * 1000);
-
-
-//        ((MainActivity)context).showMenuItem(true);
-
-
     }
 
     public void onMapReady(GoogleMap googleMap) {
-//        int STREET_LEVEL = 15;
-//        int BUILDING_LEVEL = 20;
-//        LatLng currentLocation = new LatLng(38.0405837, -84.5037164);
-//        Place currentPlace = null;
-//        googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-//        googleMap.moveCamera(newLatLngZoom(currentLocation, BUILDING_LEVEL));
-//        googleMap.addMarker(new MarkerOptions().anchor(0.0f, 1.0f).position(currentLocation));
+
         mMap = googleMap;
         mMap.getUiSettings().isMyLocationButtonEnabled();
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
@@ -181,7 +170,7 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
                 .strokeColor(Color.BLUE).radius(80));
         ValueAnimator vAnimator = new ValueAnimator();
         vAnimator.setRepeatCount(ValueAnimator.INFINITE);
-        vAnimator.setRepeatMode(ValueAnimator.RESTART);  /* PULSE */
+        vAnimator.setRepeatMode(ValueAnimator.RESTART);
         vAnimator.setIntValues(80, 0);
         vAnimator.setDuration(2500);
         vAnimator.setEvaluator(new IntEvaluator());
@@ -190,7 +179,6 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 float animatedFraction = valueAnimator.getAnimatedFraction();
-                // Log.e("", "" + animatedFraction);
                 circle.setRadius(animatedFraction * 80);
             }
         });
@@ -202,7 +190,7 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.i(TAG, "Location services connected.");//This gives permission to access the location data.
+        Log.i(TAG, "Location services connected.");
 
         try {
             lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
@@ -252,6 +240,7 @@ public class MapsView extends RelativeLayout implements OnMapReadyCallback,
 
 //
     }
+    
 
 
     private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
